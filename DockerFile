@@ -1,0 +1,55 @@
+FROM python:3.13.3-slim-bookworm
+
+# Create a virtual environment
+RUN python -m venv /opt/venv
+
+# Set the path to the virtual environment
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Upgrade pip
+COPY requirements.txt /requirements.txt
+RUN pip install --upgrade pip \
+    && pip install -r /requirements.txt
+
+# Set the environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Install the OS dependencies
+RUN apt-get update && apt-get install -y \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    libfontconfig1 \
+    libice6 \
+    libfreetype6-dev \
+    libpng-dev \
+    libtiff5-dev \
+    libwebp-dev \
+    libjpeg-dev \
+    libcairo2 \
+    libpq-dev \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create a directory for the app
+RUN mkdir -p /src_code
+
+# Set the working directory
+WORKDIR /src_code
+
+# Copy the app code into the container
+COPY ./app /src_code
+
+# Make the bash script executable
+COPY ./boot/start.sh /boot/start.sh
+RUN chmod +x /boot/start.sh
+
+# Clean up apt to reduce image size
+RUN apt-get clean && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/*
+
+# Run the bash script to start FastAPI server
+CMD ["/boot/start.sh"]
