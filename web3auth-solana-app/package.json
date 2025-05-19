@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@web3auth/node-sdk": "^4.1.0"
+  }
+}
