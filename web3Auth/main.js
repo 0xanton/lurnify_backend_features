@@ -1,6 +1,8 @@
 import { Web3Auth } from "@web3auth/modal";
 import { SolanaPrivateKeyProvider } from "@web3auth/solana-provider";
 import { WEB3AUTH_NETWORK } from "@web3auth/base";
+import { CHAIN_NAMESPACES } from "@web3auth/base";
+import { SolanaWallet } from "@web3auth/solana-provider";
 
 import {
     Connection,
@@ -21,14 +23,14 @@ const chainConfig = {
     logo: "https://images.toruswallet.io/solana.svg"
 };
 
-
+// instantiate a SolanaPrivateKey
 const privateKeyProvider = new SolanaPrivateKeyProvider({
     config: { chainConfig: chainConfig },
 });
 
 const web3auth = new Web3Auth({
     // Get it from Web3Auth Dashboard
-    clientId,
+    clientId: '', // this must be defined
     web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_MAINNET,
     privateKeyProvider: privateKeyProvider,
 });
@@ -36,9 +38,6 @@ const web3auth = new Web3Auth({
 // Get Account and balance
 const solanaWallet = new SolanaWallet(web3auth.provider);
 
-// Get user's Solana public address
-const accounts = await solanaWallet.requestAccounts();
-const block = await connection.getLatestBlockhash("finalized");
 
 const connectionConfig = await solanaWallet.request({
     method: "solana_provider_config",
@@ -47,13 +46,18 @@ const connectionConfig = await solanaWallet.request({
 
 const connection = new Connection(connectionConfig.rpcTarget);
 
+// Get user's Solana public address
+const accounts = await solanaWallet.requestAccounts();
+const block = await connection.getLatestBlockhash("finalized");
+
+
 // Fetch the balance for the specified public key
 const balance = await connection.getBalance(new PublicKey(accounts[0]));
 
 
 // sign a transaction
 
-const pubKey = await solanaWallet.requestAccounts();
+const pubKey = accounts[0];
 const { blockhash } = await connection.getLatestBlockhash("finalized");
 
 const TransactionInstruction = SystemProgram.transfer({
@@ -68,12 +72,12 @@ const TransactionInstruction2 = SystemProgram.transfer({
     lamports: 0.02 * LAMPORTS_PER_SOL,
 });
 
-const transaction = new TransactionBlockhashCtor({
+const transaction = new Transaction({
     recentBlockhash: blockhash,
     feePayer: new PublicKey(pubKey[0]),
 }).add(TransactionInstruction);
 
-const transaction2 = new TransactionBlockhashCtor({
+const transaction2 = new Transaction({
     recentBlockhash: blockhash,
     feePayer: new PublicKey(pubKey[0]),
 }).add(TransactionInstruction2);
