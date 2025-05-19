@@ -101,5 +101,4 @@ async function getPrivateKey() {
     });
 
     // Do something with privateKey
-}
-
+};
