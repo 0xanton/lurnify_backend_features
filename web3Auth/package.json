@@ -1,0 +1,21 @@
+{
+  "dependencies": {
+    "@web3auth/modal": "^9.7.0",
+    "@web3auth/node-sdk": "^4.1.0",
+    "node": "^20.19.2",
+    "nodemon": "^3.1.10",
+    "nvm": "^0.0.4"
+  },
+  "name": "web3auth",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "node --env-file = .env main.js",
+    "dev": "node --watch --trace-warnings --env-file=.env main.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module"
+}
